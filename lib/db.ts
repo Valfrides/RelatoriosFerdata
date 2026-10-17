@@ -316,15 +316,32 @@ export async function createCliente(dados: Omit<Cliente, 'id_cliente'>): Promise
   const sb = getSupabase();
   if (sb) {
     try {
+      const { data: maxRow } = await sb
+        .from('clientes')
+        .select('id_cliente')
+        .order('id_cliente', { ascending: false })
+        .limit(1);
+      const nextId = (maxRow && maxRow[0] && maxRow[0].id_cliente ? Number(maxRow[0].id_cliente) : 0) + 1;
+
       const { data, error } = await sb
         .from('clientes')
         .insert({
+          id_cliente: nextId,
           nome_empresa: dados.nome_empresa.trim(),
           contato_ac: dados.contato_ac.trim(),
         })
         .select()
         .single();
-      if (!error && data) return data as Cliente;
+      if (!error && data) {
+        try {
+          const localDb = loadDatabase();
+          localDb.clientes.push(data as Cliente);
+          saveDatabase(localDb);
+        } catch {
+          // ignora em Vercel
+        }
+        return data as Cliente;
+      }
     } catch (err) {
       console.warn('Supabase createCliente falhou:', err);
     }
@@ -498,15 +515,32 @@ export async function createUnidade(dados: Omit<Unidade, 'id_unidade'>): Promise
   const sb = getSupabase();
   if (sb) {
     try {
+      const { data: maxRow } = await sb
+        .from('unidades')
+        .select('id_unidade')
+        .order('id_unidade', { ascending: false })
+        .limit(1);
+      const nextId = (maxRow && maxRow[0] && maxRow[0].id_unidade ? Number(maxRow[0].id_unidade) : 0) + 1;
+
       const { data, error } = await sb
         .from('unidades')
         .insert({
+          id_unidade: nextId,
           id_cliente: Number(dados.id_cliente),
           nome_unidade: dados.nome_unidade.trim(),
         })
         .select()
         .single();
-      if (!error && data) return data as Unidade;
+      if (!error && data) {
+        try {
+          const localDb = loadDatabase();
+          localDb.unidades.push(data as Unidade);
+          saveDatabase(localDb);
+        } catch {
+          // ignora em Vercel
+        }
+        return data as Unidade;
+      }
     } catch (err) {
       console.warn('Supabase createUnidade falhou:', err);
     }
@@ -644,33 +678,47 @@ export async function getServicos(filtro?: Partial<FiltroRelatorio>): Promise<Se
       if (filtro?.data_inicio) query = query.gte('data_visita', filtro.data_inicio);
       if (filtro?.data_fim) query = query.lte('data_visita', filtro.data_fim);
 
-      const { data: servicosData, error } = await query.order('data_visita', { ascending: true });
-      if (!error && Array.isArray(servicosData) && servicosData.length > 0) {
-        // Busca clientes e unidades para compor os nomes com segurança
-        const [cliRes, uniRes] = await Promise.all([
-          sb.from('clientes').select('id_cliente, nome_empresa, contato_ac'),
-          sb.from('unidades').select('id_unidade, nome_unidade'),
-        ]);
+      const { data: servicosData, error } = await query
+        .order('data_visita', { ascending: true })
+        .order('id_servico', { ascending: true });
 
-        const cliMap = new Map((cliRes.data || []).map((c: any) => [c.id_cliente, c]));
-        const uniMap = new Map((uniRes.data || []).map((u: any) => [u.id_unidade, u.nome_unidade]));
+      if (!error && Array.isArray(servicosData)) {
+        if (servicosData.length === 0 && (filtro?.id_cliente || filtro?.data_inicio || filtro?.data_fim || filtro?.id_unidade)) {
+          return [];
+        }
 
-        return servicosData.map((r: any) => {
-          const cli = cliMap.get(r.id_cliente);
-          return {
-            id_servico: r.id_servico,
-            id_cliente: r.id_cliente,
-            id_unidade: r.id_unidade,
-            data_visita: r.data_visita,
-            periodo: r.periodo,
-            qtde_horas: Number(r.qtde_horas) || 0,
-            descricao_servicos: r.descricao_servicos,
-            created_at: r.created_at,
-            nome_empresa: cli?.nome_empresa || 'Cliente Desconhecido',
-            contato_ac: cli?.contato_ac || '',
-            nome_unidade: r.id_unidade ? uniMap.get(r.id_unidade) : undefined,
-          };
-        });
+        if (servicosData.length > 0) {
+          // Busca clientes e unidades para compor os nomes com segurança
+          const [cliRes, uniRes] = await Promise.all([
+            sb.from('clientes').select('id_cliente, nome_empresa, contato_ac'),
+            sb.from('unidades').select('id_unidade, nome_unidade'),
+          ]);
+
+          const localDb = loadDatabase();
+          const cliMap = new Map((cliRes.data || []).map((c: any) => [c.id_cliente, c]));
+          const uniMap = new Map((uniRes.data || []).map((u: any) => [u.id_unidade, u.nome_unidade]));
+
+          return servicosData.map((r: any) => {
+            const cli = cliMap.get(r.id_cliente) || localDb.clientes.find((c) => c.id_cliente === r.id_cliente);
+            const nomeUni = r.id_unidade
+              ? (uniMap.get(r.id_unidade) || localDb.unidades.find((u) => u.id_unidade === r.id_unidade)?.nome_unidade)
+              : undefined;
+
+            return {
+              id_servico: r.id_servico,
+              id_cliente: r.id_cliente,
+              id_unidade: r.id_unidade,
+              data_visita: r.data_visita,
+              periodo: r.periodo,
+              qtde_horas: Number(r.qtde_horas) || 0,
+              descricao_servicos: r.descricao_servicos,
+              created_at: r.created_at,
+              nome_empresa: cli?.nome_empresa || 'Cliente Desconhecido',
+              contato_ac: cli?.contato_ac || '',
+              nome_unidade: nomeUni,
+            };
+          });
+        }
       }
     } catch (err) {
       console.warn('Supabase getServicos falhou, tentando fallback:', err);
@@ -860,21 +908,73 @@ export async function createServico(dados: Omit<ServicoRealizado, 'id_servico'>)
   const sb = getSupabase();
   if (sb) {
     try {
+      // Obter o próximo id_servico para garantir que funcione mesmo se a sequence do Postgres estiver descompassada
+      const { data: maxRow } = await sb
+        .from('servicos_realizados')
+        .select('id_servico')
+        .order('id_servico', { ascending: false })
+        .limit(1);
+      const nextId = (maxRow && maxRow[0] && maxRow[0].id_servico ? Number(maxRow[0].id_servico) : 0) + 1;
+
+      const payload = {
+        id_servico: nextId,
+        id_cliente: Number(dados.id_cliente),
+        id_unidade: dados.id_unidade ? Number(dados.id_unidade) : null,
+        data_visita: dados.data_visita,
+        periodo: dados.periodo.trim(),
+        qtde_horas: Number(dados.qtde_horas) || 0,
+        descricao_servicos: dados.descricao_servicos.trim(),
+      };
+
       const { data, error } = await sb
         .from('servicos_realizados')
-        .insert({
-          id_cliente: Number(dados.id_cliente),
-          id_unidade: dados.id_unidade ? Number(dados.id_unidade) : null,
-          data_visita: dados.data_visita,
-          periodo: dados.periodo.trim(),
-          qtde_horas: Number(dados.qtde_horas) || 0,
-          descricao_servicos: dados.descricao_servicos.trim(),
-        })
+        .insert(payload)
         .select()
         .single();
+
       if (!error && data) {
+        // Espelha no db local se possível (tolerante a ambiente Vercel somente-leitura)
+        try {
+          const localDb = loadDatabase();
+          localDb.servicos.push({
+            id_servico: data.id_servico,
+            id_cliente: data.id_cliente,
+            id_unidade: data.id_unidade,
+            data_visita: data.data_visita,
+            periodo: data.periodo,
+            qtde_horas: Number(data.qtde_horas) || 0,
+            descricao_servicos: data.descricao_servicos,
+            created_at: data.created_at,
+          });
+          saveDatabase(localDb);
+        } catch {
+          // ignora em Vercel
+        }
+
         const completo = await getServicoById(data.id_servico);
         if (completo) return completo;
+
+        // Se getServicoById falhar na busca dos dados relacionados, retorna com fallback seguro
+        const [cli, uni] = await Promise.all([
+          getClienteById(data.id_cliente),
+          data.id_unidade ? getUnidades(data.id_cliente) : Promise.resolve([]),
+        ]);
+        const unidadeObj = (uni || []).find((u) => u.id_unidade === data.id_unidade);
+        return {
+          id_servico: data.id_servico,
+          id_cliente: data.id_cliente,
+          id_unidade: data.id_unidade,
+          data_visita: data.data_visita,
+          periodo: data.periodo,
+          qtde_horas: Number(data.qtde_horas) || 0,
+          descricao_servicos: data.descricao_servicos,
+          created_at: data.created_at,
+          nome_empresa: cli?.nome_empresa || 'Cliente',
+          contato_ac: cli?.contato_ac || '',
+          nome_unidade: unidadeObj?.nome_unidade,
+        };
+      } else {
+        console.error('Supabase createServico erro:', error);
       }
     } catch (err) {
       console.warn('Supabase createServico falhou:', err);
@@ -926,11 +1026,29 @@ export async function updateServico(
   const sb = getSupabase();
   if (sb) {
     try {
+      const updatePayload: Record<string, any> = {};
+      if (dados.id_cliente !== undefined) updatePayload.id_cliente = Number(dados.id_cliente);
+      if (dados.id_unidade !== undefined) updatePayload.id_unidade = dados.id_unidade ? Number(dados.id_unidade) : null;
+      if (dados.data_visita !== undefined) updatePayload.data_visita = dados.data_visita;
+      if (dados.periodo !== undefined) updatePayload.periodo = dados.periodo.trim();
+      if (dados.qtde_horas !== undefined) updatePayload.qtde_horas = Number(dados.qtde_horas);
+      if (dados.descricao_servicos !== undefined) updatePayload.descricao_servicos = dados.descricao_servicos.trim();
+
       const { error } = await sb
         .from('servicos_realizados')
-        .update(dados)
+        .update(updatePayload)
         .eq('id_servico', id_servico);
       if (!error) {
+        try {
+          const localDb = loadDatabase();
+          const index = localDb.servicos.findIndex((s) => s.id_servico === id_servico);
+          if (index !== -1) {
+            localDb.servicos[index] = { ...localDb.servicos[index], ...updatePayload };
+            saveDatabase(localDb);
+          }
+        } catch {
+          // ignora em Vercel
+        }
         return await getServicoById(id_servico);
       }
     } catch (err) {
@@ -980,7 +1098,16 @@ export async function deleteServico(id_servico: number): Promise<boolean> {
   if (sb) {
     try {
       const { error } = await sb.from('servicos_realizados').delete().eq('id_servico', id_servico);
-      if (!error) return true;
+      if (!error) {
+        try {
+          const localDb = loadDatabase();
+          localDb.servicos = localDb.servicos.filter((s) => s.id_servico !== id_servico);
+          saveDatabase(localDb);
+        } catch {
+          // ignora em Vercel
+        }
+        return true;
+      }
     } catch (err) {
       console.warn('Supabase deleteServico falhou:', err);
     }

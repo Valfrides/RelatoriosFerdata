@@ -1,0 +1,378 @@
+{
+  "clientes": [
+    {
+      "id_cliente": 1,
+      "nome_empresa": "Aluminc",
+      "contato_ac": "Sr. André"
+    },
+    {
+      "id_cliente": 2,
+      "nome_empresa": "Anelkar",
+      "contato_ac": "Sr. Carlos"
+    },
+    {
+      "id_cliente": 3,
+      "nome_empresa": "Arte&Magia",
+      "contato_ac": "Sra. Vanessa"
+    },
+    {
+      "id_cliente": 4,
+      "nome_empresa": "Exfak Corporation Inc.",
+      "contato_ac": "Sr. Sergio"
+    },
+    {
+      "id_cliente": 5,
+      "nome_empresa": "Favorita Transportes Ltda",
+      "contato_ac": "Sr. Umberto"
+    },
+    {
+      "id_cliente": 6,
+      "nome_empresa": "Glitter",
+      "contato_ac": "Sr. Roberto"
+    },
+    {
+      "id_cliente": 7,
+      "nome_empresa": "IMAEV",
+      "contato_ac": "Sr. Marcos"
+    },
+    {
+      "id_cliente": 8,
+      "nome_empresa": "Tecnibra",
+      "contato_ac": "Sr. Conrado"
+    },
+    {
+      "id_cliente": 9,
+      "nome_empresa": "Teixeira&Reis",
+      "contato_ac": "Sr. Fernando"
+    },
+    {
+      "id_cliente": 10,
+      "nome_empresa": "Tofik",
+      "contato_ac": "Sr. Tofik"
+    }
+  ],
+  "unidades": [
+    {
+      "id_unidade": 1,
+      "id_cliente": 5,
+      "nome_unidade": "Belém"
+    },
+    {
+      "id_unidade": 2,
+      "id_cliente": 5,
+      "nome_unidade": "Brasília"
+    },
+    {
+      "id_unidade": 3,
+      "id_cliente": 5,
+      "nome_unidade": "Campo Grande"
+    },
+    {
+      "id_unidade": 4,
+      "id_cliente": 5,
+      "nome_unidade": "Cuiabá"
+    },
+    {
+      "id_unidade": 5,
+      "id_cliente": 5,
+      "nome_unidade": "Espírito Santo"
+    },
+    {
+      "id_unidade": 6,
+      "id_cliente": 5,
+      "nome_unidade": "Goiânia"
+    },
+    {
+      "id_unidade": 7,
+      "id_cliente": 5,
+      "nome_unidade": "Joinville"
+    },
+    {
+      "id_unidade": 8,
+      "id_cliente": 5,
+      "nome_unidade": "Palmas"
+    },
+    {
+      "id_unidade": 9,
+      "id_cliente": 5,
+      "nome_unidade": "São Paulo"
+    },
+    {
+      "id_unidade": 10,
+      "id_cliente": 5,
+      "nome_unidade": "Sumaré"
+    }
+  ],
+  "servicos": [
+    {
+      "id_servico": 1,
+      "id_cliente": 4,
+      "id_unidade": null,
+      "data_visita": "2026-09-01",
+      "periodo": "02 Horas de laboratório",
+      "qtde_horas": 2,
+      "descricao_servicos": "Formatação, instalação do sistema operacional e softwares essenciais, configurado PC para uso no caixa da loja Osasco."
+    },
+    {
+      "id_servico": 2,
+      "id_cliente": 4,
+      "id_unidade": null,
+      "data_visita": "2026-09-02",
+      "periodo": "12:00 às 16:00 Horas",
+      "qtde_horas": 4,
+      "descricao_servicos": "Passagem 4 cabos de rede K&T, projeto Sr. Emerson."
+    },
+    {
+      "id_servico": 3,
+      "id_cliente": 4,
+      "id_unidade": null,
+      "data_visita": "2026-09-02",
+      "periodo": "10:00 às 12:00 Horas",
+      "qtde_horas": 2,
+      "descricao_servicos": "Passagem cabo de rede, fixação eletroduto, crimpagem keystone ponto de rede Router - Sr. Rafael RC Plast."
+    },
+    {
+      "id_servico": 4,
+      "id_cliente": 4,
+      "id_unidade": null,
+      "data_visita": "2026-09-04",
+      "periodo": "10:00 às 16:00 Horas",
+      "qtde_horas": 6,
+      "descricao_servicos": "- Passagem 2 cabos de rede adicionais a pedido Sr. Emerson.\n- Fixação, montagem caixa de passagem, instalação switch 8 portas gigabit, crimpagem cabos de rede.\n- Fixação, crimpagem 3 pontos de rede."
+    },
+    {
+      "id_servico": 5,
+      "id_cliente": 4,
+      "id_unidade": null,
+      "data_visita": "2026-09-09",
+      "periodo": "10:00 às 13:00 Horas",
+      "qtde_horas": 3,
+      "descricao_servicos": "- Fixação eletroduto, passagem cabos de rede.\n- Fixação, crimpagem 3 pontos de rede."
+    },
+    {
+      "id_servico": 6,
+      "id_cliente": 4,
+      "id_unidade": null,
+      "data_visita": "2026-09-10",
+      "periodo": "02 Horas de laboratório",
+      "qtde_horas": 2,
+      "descricao_servicos": "- Formatação, instalação do sistema operacional e softwares essenciais, configurado PC HP para uso na loja Osasco, usuário \"loja03\"."
+    },
+    {
+      "id_servico": 7,
+      "id_cliente": 4,
+      "id_unidade": null,
+      "data_visita": "2026-09-11",
+      "periodo": "12:20 às 16:00 Horas",
+      "qtde_horas": 3.67,
+      "descricao_servicos": "- Entrega PC Loja, configurado usuário \"Loja03\".\n- Configuração HP All in One para uso em Minas Gerais.\n- Crimpagem cabo de rede impressora Depto. Adm.\n- Ajuste nas configurações do teclado estação de trabalho Sra. Vitória.\n- Ajuste nas configurações do teclado estação de trabalho Depto. Vendas.\n- Verificação notebook Sr. Laurindo.\n- Auxílio Srta. Adriana na configuração de mensagem de férias no e-mail.\n- Verificação dos vencimentos de serviços no portal GoDaddy.\n- Retirada 4 nobreaks e 2 PCs para orçamento em laboratório."
+    },
+    {
+      "id_servico": 8,
+      "id_cliente": 4,
+      "id_unidade": null,
+      "data_visita": "2026-09-11",
+      "periodo": "11:00 às 12:00 Horas",
+      "qtde_horas": 1,
+      "descricao_servicos": "- Atendido suporte técnico solicitado pela Srta. Patricia, sem sinal de internet.\n- Ajuste nas configurações do roteador para acesso à internet provedor Vivo, provedor Claro sem sinal."
+    },
+    {
+      "id_servico": 9,
+      "id_cliente": 4,
+      "id_unidade": null,
+      "data_visita": "2026-09-16",
+      "periodo": "09:00 às 13:30 Horas",
+      "qtde_horas": 4.5,
+      "descricao_servicos": "- Atendido suporte técnico solicitado pelo Sr. Charles - Loja Osasco.\n- Substituição do PC do caixa, backup, restauração do perfil de usuário, instalação e compartilhamento da impressora multifuncional Epson, instalação nas demais estações da loja."
+    },
+    {
+      "id_servico": 10,
+      "id_cliente": 4,
+      "id_unidade": null,
+      "data_visita": "2026-09-22",
+      "periodo": "04 Horas de laboratório",
+      "qtde_horas": 4,
+      "descricao_servicos": "- Formatação, instalação sistema operacional, softwares essenciais, configuração perfil usuário: vendas em 2 estações de trabalho HP."
+    },
+    {
+      "id_servico": 11,
+      "id_cliente": 4,
+      "id_unidade": null,
+      "data_visita": "2026-09-23",
+      "periodo": "08:30 às 13:30 Horas",
+      "qtde_horas": 5,
+      "descricao_servicos": "- Atendido chamado técnico solicitado pela Sra. Fernanda Oliveira - Loja Incompany.\n- Configuração novo PC All in One Dell, instalação dos softwares essenciais, configuração do perfil de usuário e acesso às pastas da rede, impressoras da rede.\n- Auxílio Sra. Monica na senha de acesso aos arquivos enviados para a contabilidade, modelos de e-mails."
+    },
+    {
+      "id_servico": 12,
+      "id_cliente": 4,
+      "id_unidade": null,
+      "data_visita": "2026-09-25",
+      "periodo": "11:00 às 14:30 Horas",
+      "qtde_horas": 3.5,
+      "descricao_servicos": "- Atendido chamado técnico solicitado pelo Sr. Charles - Loja Osasco.\n- Passagem cabo de rede para criação de ponto de rede no estoque da loja."
+    },
+    {
+      "id_servico": 13,
+      "id_cliente": 4,
+      "id_unidade": null,
+      "data_visita": "2026-09-28",
+      "periodo": "13:00 às 17:00 Horas",
+      "qtde_horas": 4,
+      "descricao_servicos": "- Entrega 2 estações de trabalho HP, Depto. Vendas.\n- Verificação notebook Sra. Priscila, atualização dos drivers, sistema operacional, identificado problema na placa de som.\n- Ajuste na configuração do e-mail Sra. Jeane.\n- Verificação PC All in One HP, Juco, retirado para formatação em laboratório.\n- Retirado toners impressora colorida HP para análise em laboratório."
+    },
+    {
+      "id_servico": 14,
+      "id_cliente": 5,
+      "id_unidade": 8,
+      "data_visita": "2026-09-24",
+      "periodo": "01 Hora suporte remoto",
+      "qtde_horas": 1,
+      "descricao_servicos": "- Atendido suporte técnico remoto solicitado pela Sra. Andreia - Unidade Palmas.\n- Configuração do acesso à VPN dados do servidor Matriz."
+    },
+    {
+      "id_servico": 15,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-01",
+      "periodo": "08:45 às 17:00 Horas",
+      "qtde_horas": 8.25,
+      "descricao_servicos": "- Criação da caixa postal: expedicaocba@favorita.com.br.\n- Criação acesso SFTP cliente Mahle a pedido Sr. Sidney - Depto. Faturamento.\n- Solicitação 369 - Fernanda - Depto. Torre de controle.\n- Verificação TI370, detectado problema na placa mãe, passado orçamento.\n- Verificação TI363, efetuado a troca do SSD por outro usado, formatado e reinstalado sistema, configurado para setor operacional.\n- Retirado impressora TI350 para troca do display."
+    },
+    {
+      "id_servico": 16,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-03",
+      "periodo": "02 Horas adicionais",
+      "qtde_horas": 2,
+      "descricao_servicos": "- Backup no servidor das caixas postais: cleidianesouza@favorita.com.br, viviane@favorita.com.br, gerenciarh@favorita.com.br, cheia se aproximando do limite de armazenamento."
+    },
+    {
+      "id_servico": 17,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-03",
+      "periodo": "08:50 às 13:20 Horas",
+      "qtde_horas": 4.5,
+      "descricao_servicos": "- Solicitação 372 - Breno - Depto. Torre de controle.\n- Instalação impressora de cheques Sr. Giovanny - Depto. RH.\n- Verificação do Microsoft Outlook na estação Sra. Tais - Depto. RH.\n- Eliminação da mensagem de notificação do Adobe em duas estações do Depto. Torre de controle."
+    },
+    {
+      "id_servico": 18,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-08",
+      "periodo": "08:50 às 17:00 Horas",
+      "qtde_horas": 8.16,
+      "descricao_servicos": "- Eliminação da mensagem de notificação do software Adobe na estação Sr. Lucas - Depto. Expedição.\n- Ajuste nas configurações do Microsoft Outlook PC Expedição.\n- Ajuste nas visualizações dos arquivos de imagem .jpg PC Torre de controle.\n- Criação da caixa postal joseluiz@favorita.com.br - Depto. Financeiro.\n- Instalação sistema operacional linux server PC HP All in one para realização de testes."
+    },
+    {
+      "id_servico": 19,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-10",
+      "periodo": "08:20 às 13:20 Horas",
+      "qtde_horas": 5,
+      "descricao_servicos": "- Reinstalação do Microsoft Office na estação de trabalho Sr. Jovaniel - Depto. Torre de controle.\n- Ajuste nas configurações do e-mail Sr. Hugo no Microsoft Outlook - Depto. Expedição.\n- Ajuste nas configurações do grupo de distribuição \"expedicaospo@favorita.com.br\", inclusão dos membros: Rafael e Jefferson a pedido Sr. César - Depto. Expedição.\n- Ajuste nas configurações de segurança do Microsoft Access para acesso sistema desenvolvido pelo Sr. Sidney nas estações: Sra. Fernanda Rodrigues e Sra. Giselle - Depto Torre de controle.\n- Verificação do acesso às pastas da rede na estação Sr. Lucas - Depto. Devolução.\n- Instalação e configuração access point Intelbras Twibi na sala de reuniões 2º andar, passagem de cabo de rede provisório.\n- Verificação dos serviços na sala de TI."
+    },
+    {
+      "id_servico": 20,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-13",
+      "periodo": "02 Horas adicionais",
+      "qtde_horas": 2,
+      "descricao_servicos": "- Backup no servidor das caixas postais: sandraconstantini@favorita.com.br, larissaramos@favorita.com.br, cheia se aproximando do limite de armazenamento e nathaliaserra@favorita.com.br antes da exclusão."
+    },
+    {
+      "id_servico": 21,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-14",
+      "periodo": "10:30 às 16:30 Horas",
+      "qtde_horas": 6,
+      "descricao_servicos": "- Passagem 2 cabos de rede, 1 cabo HDMI, 1 cabo extensão elétrica, na sala de reuniões 3º andar.\n- Instalação do access point Intelbras Twibi na mesa da sala de reuniões 3º andar."
+    },
+    {
+      "id_servico": 22,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-15",
+      "periodo": "08:30 às 16:50 Horas",
+      "qtde_horas": 8.33,
+      "descricao_servicos": "- Contatado suporte técnico Mundivox para verificação do link de internet, realização de testes.\n- Reinstalação do Microsoft Office na estação Srta. Vitória - Depto. Compras.\n- Reinstalação do Microsoft Office na estação Sra. Patricia - Depto. Financeiro.\n- Solicitação 376 - Pincéis Atlas.\n- Solicitação 377 - Thais.\n- Solicitação 375 - José Luiz.\n- Verificação de problemas na sala TI.\n- Verificação de problemas setor recebimento.\n- Retirado para manutenção/orçamento impressora de etiqueta da doca 12."
+    },
+    {
+      "id_servico": 23,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-17",
+      "periodo": "08:30 às 17:00 Horas",
+      "qtde_horas": 8.5,
+      "descricao_servicos": "- Solicitação 379 - Modem ZTE.\n- Substituição dos aparelhos wi-fi Unifi Ubiquiti: Depto. Torre de controle, Depto. Financeiro, Depto. Comercial, fixação no teto.\n- Ajuste nas configurações da rede wi-fi.\n- Configuração notebook Sr. Isaque para home office - Depto. Compras."
+    },
+    {
+      "id_servico": 24,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-17",
+      "periodo": "02 Horas adicionais",
+      "qtde_horas": 2,
+      "descricao_servicos": "- Backup no servidor das caixas postais: jovaniel@favorita.com.br, marcelomacena@favorita.com.br, cheia se aproximando do limite de armazenamento e yasminmedeiros@favorita.com.br antes da exclusão."
+    },
+    {
+      "id_servico": 25,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-19",
+      "periodo": "02 Horas adicionais",
+      "qtde_horas": 2,
+      "descricao_servicos": "- Backup no servidor das caixas postais: sabrinacosta@favorita.com.br, eduardovalerio@favorita.com.br, paulamoreira@favorita.com.br, cheia se aproximando do limite de armazenamento."
+    },
+    {
+      "id_servico": 26,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-22",
+      "periodo": "08:30 às 17:00 Horas",
+      "qtde_horas": 8.5,
+      "descricao_servicos": "- Ajuste nas configurações do Microsoft Outlook Sr. Marcelo Macena, criação de regras de recebimento e exclusão na plataforma Zoho Mail - Depto. Operacional.\n- Reconfiguração completa do perfil de usuário Jose Kaua - Depto. Frota.\n- Substituição monitor Charles - Depto. RH, solicitação 386.\n- Limpeza dos arquivos temporários notebook Sra. Tais - Depto. RH.\n- Substituição da estação de trabalho Sr. André - Depto. Segurança do Trabalho.\n- Ajustes nas configurações do sistema Makro XML notebook Sra. Leonilda - Depto. Financeiro."
+    },
+    {
+      "id_servico": 27,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-23",
+      "periodo": "04 Horas adicionais",
+      "qtde_horas": 4,
+      "descricao_servicos": "- Criação aplicativo Checklist Cavalo para Depto. Frota na plataforma Zoho Creator."
+    },
+    {
+      "id_servico": 28,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-24",
+      "periodo": "08:30 às 17:00 Horas",
+      "qtde_horas": 8.5,
+      "descricao_servicos": "- Configuração do acesso à pasta FTP Comercial na estação Srta. Camila - Depto. Qualidade.\n- Configuração do certificado digital A1 Matriz na estação Sr. José Kaua - Depto. Frota.\n- Substituição do carregador notebook Dell Sr. Douglas - Depto. Frota. Solicitação 389.\n- Apresentação, testes acessos no aplicativo Checklist Cavalo junto com Sr. Bruno - Depto. Frota.\n- Solicitação 380 - Marluce Gyn.\n- Solicitação 387 - Eduardo Bel.\n- Passagem cabo de rede e instalação wi-fi Ubiquiti Unifi Depto. Carregamento doca 25.\n- Configuração para setor administrativo o PC que era usado pelo André Segurança do Trabalho.\n- Finalizado TI378, impressora zebra zd 220 que foi trocado o Jac da entrada de energia.\n- Instalação impressora zebra ZD 220 no setor recebimento.\n- Troca do teclado do Vinicius no setor comercial (TI388)."
+    },
+    {
+      "id_servico": 29,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-28",
+      "periodo": "10 Horas adicionais",
+      "qtde_horas": 10,
+      "descricao_servicos": "- Renovação plataforma de criação de aplicativos Zoho Creator."
+    },
+    {
+      "id_servico": 30,
+      "id_cliente": 5,
+      "id_unidade": 9,
+      "data_visita": "2026-09-29",
+      "periodo": "09:30 às 17:30 Horas",
+      "qtde_horas": 8,
+      "descricao_servicos": "- Passagem 2 cabos de rede para instalação leitores facial entrada e saída do galpão.\n- Ajuste nas configurações do Microsoft Outlook na estação Sra. Fernanda Rodrigues - Depto. Torre de controle.\n- Criação da caixa postal emelly@favorita.com.br a pedido Sr. Jeorge - Unidade Brasília.\n- Configuração estação de trabalho para menor aprendiz - Depto. Torre de controle.\n- Inclusão certificado digital A1 Matriz no sistema Une a pedido Sra. Ana Lucia - Depto. Financeiro.\n- Passagem 2 cabos de rede Depto. Carregamento.\n- Mudança de posição das câmeras das docas 15, 16 e 17, conforme foi solicitado pelo Murilo à segurança."
+    }
+  ]
+}
