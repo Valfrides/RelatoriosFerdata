@@ -1,0 +1,6 @@
+{
+  "name": "Ferdata Informática - Gestão de Serviços & Relatórios Técnicos",
+  "description": "Sistema para registro de serviços técnicos prestados a clientes e emissão de relatórios formais em PDF.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
