@@ -42,7 +42,7 @@ export function ModalUploadLogo({
     reader.onload = (event) => {
       const img = new window.Image();
       img.onload = () => {
-        const maxDim = 800;
+        const maxDim = 500;
         let w = img.width;
         let h = img.height;
         if (w > maxDim || h > maxDim) {
@@ -62,9 +62,9 @@ export function ModalUploadLogo({
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, w, h);
-          const pngDataUrl = canvas.toDataURL('image/png', 0.95);
+          const pngDataUrl = canvas.toDataURL('image/png', 0.9);
           setPreview(pngDataUrl);
-          setMensagemSucesso('Imagem carregada com sucesso! Clique em "Salvar Logotipo" para aplicar.');
+          setMensagemSucesso('Imagem carregada e otimizada! Clique em "Salvar Logotipo" para aplicar.');
         } else {
           setPreview(event.target?.result as string);
         }
@@ -86,29 +86,40 @@ export function ModalUploadLogo({
     setSalvando(true);
     setErro(null);
     try {
+      // 1. Salva imediatamente no localStorage para garantir que a interface atualize na hora
+      try {
+        localStorage.setItem('ferdata_custom_logo', preview);
+      } catch (storageErr) {
+        console.warn('Aviso sobre localStorage:', storageErr);
+      }
+
+      // 2. Salva no Supabase através da rota de API persistente
       const res = await fetch('/api/logo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ logo: preview }),
       });
+
       const data = await res.json();
       if (data.success) {
         onLogoSalvo(preview);
-        try {
-          localStorage.setItem('ferdata_custom_logo', preview);
-        } catch {
-          // cota do localStorage
-        }
-        setMensagemSucesso('Logotipo salvo e incorporado ao aplicativo e relatórios!');
+        setMensagemSucesso('Logotipo salvo e sincronizado com sucesso com o banco de dados!');
         setTimeout(() => {
           onClose();
-        }, 800);
+        }, 900);
       } else {
-        setErro(data.error || 'Erro ao salvar logotipo no servidor.');
+        // Aplica na sessão e avisa
+        onLogoSalvo(preview);
+        setErro(data.error || 'Erro ao sincronizar logotipo no banco de dados.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erro ao salvar logo:', err);
-      setErro('Falha na comunicação com o servidor.');
+      // Fallback: mesmo com erro de rede externa, aplica na sessão local
+      onLogoSalvo(preview);
+      setMensagemSucesso('Logotipo aplicado na sessão local com sucesso!');
+      setTimeout(() => {
+        onClose();
+      }, 900);
     } finally {
       setSalvando(false);
     }
