@@ -25,13 +25,23 @@ export function ModalFavoritaHoras({
   onVisualizarPdf,
   customLogo,
 }: ModalFavoritaHorasProps) {
-  const [dataInicio, setDataInicio] = useState('2026-09-01');
-  const [dataFim, setDataFim] = useState('2026-09-30');
+  const [dataInicio, setDataInicio] = useState('');
+  const [dataFim, setDataFim] = useState('');
   const [unidadeFiltro, setUnidadeFiltro] = useState<number | 'todas'>('todas');
   const [horasContratadas, setHorasContratadas] = useState<number>(52);
   const [tipoModelo, setTipoModelo] = useState<'favorita_horas' | 'completo_servicos'>('favorita_horas');
   const [servicos, setServicos] = useState<ServicoRealizadoCompleto[]>([]);
   const [carregando, setCarregando] = useState(false);
+
+  const dataInicioRef = React.useRef<HTMLInputElement>(null);
+  const dataFimRef = React.useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setDataInicio('');
+      setDataFim('');
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (!clienteFavorita || !isOpen) return;
@@ -112,7 +122,8 @@ export function ModalFavoritaHoras({
     const doc = obterDocPdf();
     const sufixo = unidadeSelecionadaObj ? `_${unidadeSelecionadaObj.nome_unidade}` : '_Consolidado';
     const tipoSufixo = tipoModelo === 'favorita_horas' ? '_Horas_Totais' : '_Servicos_Detalhados';
-    doc.save(`Favorita${tipoSufixo}${sufixo}_${dataInicio}_a_${dataFim}.pdf`);
+    const periodoSufixo = dataInicio && dataFim ? `_${dataInicio}_a_${dataFim}` : '_Geral';
+    doc.save(`Favorita${tipoSufixo}${sufixo}${periodoSufixo}.pdf`);
   };
 
   const handleVisualizarPdf = () => {
@@ -202,21 +213,55 @@ export function ModalFavoritaHoras({
               </select>
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1">Data Início</label>
+              <label
+                onClick={() => {
+                  try {
+                    dataInicioRef.current?.showPicker?.();
+                  } catch {}
+                  dataInicioRef.current?.focus();
+                }}
+                className="block text-xs text-slate-400 mb-1 cursor-pointer hover:text-white transition"
+              >
+                Data Início
+              </label>
               <input
+                ref={dataInicioRef}
                 type="date"
                 value={dataInicio}
                 onChange={(e) => setDataInicio(e.target.value)}
-                className="w-full text-xs bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-slate-200 focus:ring-1 focus:ring-amber-500"
+                onClick={(e) => {
+                  try {
+                    (e.target as HTMLInputElement).showPicker?.();
+                  } catch {}
+                }}
+                style={{ colorScheme: 'dark' }}
+                className="w-full text-xs bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-slate-200 focus:ring-1 focus:ring-amber-500 cursor-pointer"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1">Data Término</label>
+              <label
+                onClick={() => {
+                  try {
+                    dataFimRef.current?.showPicker?.();
+                  } catch {}
+                  dataFimRef.current?.focus();
+                }}
+                className="block text-xs text-slate-400 mb-1 cursor-pointer hover:text-white transition"
+              >
+                Data Término
+              </label>
               <input
+                ref={dataFimRef}
                 type="date"
                 value={dataFim}
                 onChange={(e) => setDataFim(e.target.value)}
-                className="w-full text-xs bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-slate-200 focus:ring-1 focus:ring-amber-500"
+                onClick={(e) => {
+                  try {
+                    (e.target as HTMLInputElement).showPicker?.();
+                  } catch {}
+                }}
+                style={{ colorScheme: 'dark' }}
+                className="w-full text-xs bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-slate-200 focus:ring-1 focus:ring-amber-500 cursor-pointer"
               />
             </div>
           </div>

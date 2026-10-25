@@ -27,8 +27,8 @@ export function ModalRelatorio({
   onVisualizarPdf,
   customLogo,
 }: ModalRelatorioProps) {
-  const [dataInicio, setDataInicio] = useState('2026-09-01');
-  const [dataFim, setDataFim] = useState('2026-09-30');
+  const [dataInicio, setDataInicio] = useState('');
+  const [dataFim, setDataFim] = useState('');
   const [unidadeSelecionadaId, setUnidadeSelecionadaId] = useState<number | null>(
     unidade ? unidade.id_unidade : null
   );
@@ -36,13 +36,20 @@ export function ModalRelatorio({
   const [servicosFiltrados, setServicosFiltrados] = useState<ServicoRealizadoCompleto[]>([]);
   const [totalHoras, setTotalHoras] = useState(0);
 
+  const dataInicioRef = React.useRef<HTMLInputElement>(null);
+  const dataFimRef = React.useRef<HTMLInputElement>(null);
+
   useEffect(() => {
-    if (unidade) {
-      setUnidadeSelecionadaId(unidade.id_unidade);
-    } else {
-      setUnidadeSelecionadaId(null);
+    if (isOpen) {
+      setDataInicio('');
+      setDataFim('');
+      if (unidade) {
+        setUnidadeSelecionadaId(unidade.id_unidade);
+      } else {
+        setUnidadeSelecionadaId(null);
+      }
     }
-  }, [unidade, isOpen]);
+  }, [isOpen, unidade]);
 
   useEffect(() => {
     if (!cliente || !isOpen) return;
@@ -100,7 +107,8 @@ export function ModalRelatorio({
     const doc = obterInstanciaPdf();
     const nomeLimpo = cliente.nome_empresa.replace(/[^a-zA-Z0-9]/g, '_');
     const unidadeSlug = unidadeAtual ? `_${unidadeAtual.nome_unidade}` : '';
-    const nomeArquivo = `Relatorio_${nomeLimpo}${unidadeSlug}_${dataInicio}_a_${dataFim}.pdf`;
+    const periodoSufixo = dataInicio && dataFim ? `_${dataInicio}_a_${dataFim}` : '_Geral';
+    const nomeArquivo = `Relatorio_${nomeLimpo}${unidadeSlug}${periodoSufixo}.pdf`;
     doc.save(nomeArquivo);
   };
 
@@ -210,26 +218,76 @@ export function ModalRelatorio({
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Data de Início</label>
-                <div className="relative">
-                  <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <label
+                  onClick={() => {
+                    try {
+                      dataInicioRef.current?.showPicker?.();
+                    } catch {}
+                    dataInicioRef.current?.focus();
+                  }}
+                  className="block text-xs text-slate-400 mb-1 cursor-pointer hover:text-slate-200 transition"
+                >
+                  Data de Início
+                </label>
+                <div
+                  className="relative cursor-pointer"
+                  onClick={() => {
+                    try {
+                      dataInicioRef.current?.showPicker?.();
+                    } catch {}
+                    dataInicioRef.current?.focus();
+                  }}
+                >
+                  <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                   <input
+                    ref={dataInicioRef}
                     type="date"
                     value={dataInicio}
                     onChange={(e) => setDataInicio(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onClick={(e) => {
+                      try {
+                        (e.target as HTMLInputElement).showPicker?.();
+                      } catch {}
+                    }}
+                    style={{ colorScheme: 'dark' }}
+                    className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Data de Término</label>
-                <div className="relative">
-                  <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <label
+                  onClick={() => {
+                    try {
+                      dataFimRef.current?.showPicker?.();
+                    } catch {}
+                    dataFimRef.current?.focus();
+                  }}
+                  className="block text-xs text-slate-400 mb-1 cursor-pointer hover:text-slate-200 transition"
+                >
+                  Data de Término
+                </label>
+                <div
+                  className="relative cursor-pointer"
+                  onClick={() => {
+                    try {
+                      dataFimRef.current?.showPicker?.();
+                    } catch {}
+                    dataFimRef.current?.focus();
+                  }}
+                >
+                  <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                   <input
+                    ref={dataFimRef}
                     type="date"
                     value={dataFim}
                     onChange={(e) => setDataFim(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onClick={(e) => {
+                      try {
+                        (e.target as HTMLInputElement).showPicker?.();
+                      } catch {}
+                    }}
+                    style={{ colorScheme: 'dark' }}
+                    className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                   />
                 </div>
               </div>
@@ -237,20 +295,23 @@ export function ModalRelatorio({
 
             <div className="flex flex-wrap gap-2 pt-1 text-xs text-slate-400 items-center">
               <span>Atalhos:</span>
-              <button
-                type="button"
-                onClick={() => definirPeriodo('2026-09-01', '2026-09-30')}
-                className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 transition cursor-pointer"
-              >
-                Setembro / 2026 (Base Access)
-              </button>
+              {(dataInicio || dataFim) && (
+                <button
+                  type="button"
+                  onClick={() => definirPeriodo('', '')}
+                  className="px-2.5 py-1 bg-red-950/60 hover:bg-red-900/60 text-red-300 rounded border border-red-800/60 transition cursor-pointer"
+                >
+                  Limpar Período
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => {
                   const now = new Date();
                   const y = now.getFullYear();
                   const m = String(now.getMonth() + 1).padStart(2, '0');
-                  definirPeriodo(`${y}-${m}-01`, `${y}-${m}-28`);
+                  const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+                  definirPeriodo(`${y}-${m}-01`, `${y}-${m}-${lastDay}`);
                 }}
                 className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 transition cursor-pointer"
               >
@@ -258,7 +319,14 @@ export function ModalRelatorio({
               </button>
               <button
                 type="button"
-                onClick={() => definirPeriodo('2020-01-01', '2030-12-31')}
+                onClick={() => definirPeriodo('2026-09-01', '2026-09-30')}
+                className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 transition cursor-pointer"
+              >
+                Setembro / 2026
+              </button>
+              <button
+                type="button"
+                onClick={() => definirPeriodo('', '')}
                 className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 transition cursor-pointer"
               >
                 Todo o Histórico

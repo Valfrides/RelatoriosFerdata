@@ -47,6 +47,7 @@ export function CadastroServicos({
   const [feedback, setFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null);
   const [idEditando, setIdEditando] = useState<number | null>(null);
   const [termoPesquisa, setTermoPesquisa] = useState('');
+  const dataVisitaRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (servicoParaEdicao) {
@@ -329,19 +330,45 @@ export function CadastroServicos({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <label
+                  onClick={() => {
+                    try {
+                      dataVisitaRef.current?.showPicker?.();
+                    } catch {}
+                    dataVisitaRef.current?.focus();
+                  }}
+                  className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5 cursor-pointer hover:text-white transition"
+                >
                   <Calendar className="w-3.5 h-3.5 text-blue-400" />
                   <span>Data da Visita</span>
                   <span className="text-red-400">*</span>
                 </label>
               </div>
-              <input
-                type="date"
-                value={dataVisita}
-                onChange={(e) => setDataVisita(e.target.value)}
-                required
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div
+                className="relative cursor-pointer"
+                onClick={() => {
+                  try {
+                    dataVisitaRef.current?.showPicker?.();
+                  } catch {}
+                  dataVisitaRef.current?.focus();
+                }}
+              >
+                <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <input
+                  ref={dataVisitaRef}
+                  type="date"
+                  value={dataVisita}
+                  onChange={(e) => setDataVisita(e.target.value)}
+                  onClick={(e) => {
+                    try {
+                      (e.target as HTMLInputElement).showPicker?.();
+                    } catch {}
+                  }}
+                  required
+                  style={{ colorScheme: 'dark' }}
+                  className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                />
+              </div>
               <div className="flex gap-1.5 mt-1 text-[11px] text-slate-400">
                 <button type="button" onClick={definirDataHoje} className="hover:text-blue-400 underline cursor-pointer">
                   Hoje
