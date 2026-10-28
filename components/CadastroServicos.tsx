@@ -209,16 +209,23 @@ export function CadastroServicos({
     return () => window.removeEventListener('keydown', handleKeyDown);
   });
 
-  const registrosFiltrados = servicosExistentes.filter((s) => {
-    if (!termoPesquisa) return true;
-    const termo = termoPesquisa.toLowerCase();
-    return (
-      (s.nome_empresa && s.nome_empresa.toLowerCase().includes(termo)) ||
-      (s.nome_unidade && s.nome_unidade.toLowerCase().includes(termo)) ||
-      (s.descricao_servicos && s.descricao_servicos.toLowerCase().includes(termo)) ||
-      s.data_visita.includes(termo)
-    );
-  });
+  const registrosFiltrados = servicosExistentes
+    .filter((s) => {
+      if (!termoPesquisa) return true;
+      const termo = termoPesquisa.toLowerCase();
+      return (
+        (s.nome_empresa && s.nome_empresa.toLowerCase().includes(termo)) ||
+        (s.nome_unidade && s.nome_unidade.toLowerCase().includes(termo)) ||
+        (s.descricao_servicos && s.descricao_servicos.toLowerCase().includes(termo)) ||
+        s.data_visita.includes(termo)
+      );
+    })
+    .sort((a, b) => {
+      if (a.data_visita !== b.data_visita) {
+        return b.data_visita.localeCompare(a.data_visita);
+      }
+      return (b.id_servico || 0) - (a.id_servico || 0);
+    });
 
   const totalRegistros = servicosExistentes.length;
 
@@ -572,7 +579,7 @@ export function CadastroServicos({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-slate-300">
-              {registrosFiltrados.slice(0, 8).map((servico) => (
+              {registrosFiltrados.slice(0, 10).map((servico) => (
                 <tr key={servico.id_servico} className="hover:bg-slate-800/40 transition">
                   <td className="py-2.5 px-3 font-mono text-blue-400 whitespace-nowrap">
                     {servico.data_visita}

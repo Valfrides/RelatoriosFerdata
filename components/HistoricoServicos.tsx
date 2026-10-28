@@ -49,11 +49,20 @@ export function HistoricoServicos({
     return true;
   });
 
+  const servicosOrdenados = [...servicosFiltrados].sort((a, b) => {
+    // 1. Mais recente primeiro por data da visita
+    if (a.data_visita !== b.data_visita) {
+      return b.data_visita.localeCompare(a.data_visita);
+    }
+    // 2. Desempate: ID mais recente primeiro (maior id no topo)
+    return (b.id_servico || 0) - (a.id_servico || 0);
+  });
+
   const totalHoras = servicosFiltrados.reduce((acc, s) => acc + (Number(s.qtde_horas) || 0), 0);
 
   const exportarCSV = () => {
     const cabecalho = 'ID,Data,Cliente,Unidade,Período,Horas,Serviços Realizados\n';
-    const linhas = servicosFiltrados.map((s) => {
+    const linhas = servicosOrdenados.map((s) => {
       const descLimpa = `"${s.descricao_servicos.replace(/"/g, '""')}"`;
       const empresa = `"${s.nome_empresa || ''}"`;
       const unidade = `"${s.nome_unidade || ''}"`;
@@ -162,56 +171,67 @@ export function HistoricoServicos({
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800 gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             <span>
-              Exibindo <strong>{servicosFiltrados.length}</strong> de <strong>{servicos.length}</strong> serviços
+              Exibindo <strong>{servicosOrdenados.length}</strong> de <strong>{servicos.length}</strong> serviços
+            </span>
+            <span>•</span>
+            <span className="text-blue-400 font-medium">
+              Mais recentes no topo
             </span>
             <span>•</span>
             <span>
               Total de Horas: <strong className="text-amber-400">{totalHoras.toFixed(2)}h</strong>
             </span>
           </div>
-          {(busca || clienteFiltro !== 'todos' || dataInicio || dataFim) && (
-            <button
-              onClick={() => {
-                setBusca('');
-                setClienteFiltro('todos');
-                setDataInicio('');
-                setDataFim('');
-              }}
-              className="text-blue-400 hover:underline cursor-pointer"
-            >
-              Limpar Filtros
-            </button>
-          )}
+          <div className="flex items-center gap-3">
+            {servicosOrdenados.length > 10 && (
+              <span className="text-[11px] text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60">
+                10 visíveis • Role a lateral para ver os demais
+              </span>
+            )}
+            {(busca || clienteFiltro !== 'todos' || dataInicio || dataFim) && (
+              <button
+                onClick={() => {
+                  setBusca('');
+                  setClienteFiltro('todos');
+                  setDataInicio('');
+                  setDataFim('');
+                }}
+                className="text-blue-400 hover:underline cursor-pointer"
+              >
+                Limpar Filtros
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       <div className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-xl">
-        <div className="overflow-x-auto">
+        <div className="max-h-[580px] overflow-y-auto overflow-x-auto relative">
           <table className="w-full text-left text-xs border-collapse">
-            <thead>
+            <thead className="sticky top-0 z-20 bg-slate-950 shadow-md">
               <tr className="bg-slate-950 text-slate-400 uppercase font-semibold border-b border-slate-800">
-                <th className="py-3 px-4">#</th>
-                <th className="py-3 px-4">Data</th>
-                <th className="py-3 px-4">Cliente</th>
-                <th className="py-3 px-4">Unidade</th>
-                <th className="py-3 px-4">Período</th>
-                <th className="py-3 px-4">Horas</th>
-                <th className="py-3 px-4">Serviços Executados</th>
-                <th className="py-3 px-4 text-right">Ações</th>
+                <th className="py-3 px-4 bg-slate-950">#</th>
+                <th className="py-3 px-4 bg-slate-950">Data</th>
+                <th className="py-3 px-4 bg-slate-950">Cliente</th>
+                <th className="py-3 px-4 bg-slate-950">Unidade</th>
+                <th className="py-3 px-4 bg-slate-950">Período</th>
+                <th className="py-3 px-4 bg-slate-950">Horas</th>
+                <th className="py-3 px-4 bg-slate-950">Serviços Executados</th>
+                <th className="py-3 px-4 bg-slate-950 text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-slate-300">
-              {servicosFiltrados.length === 0 ? (
+              {servicosOrdenados.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-8 text-center text-slate-500">
                     Nenhum serviço atende aos critérios de filtro informados.
                   </td>
                 </tr>
               ) : (
-                servicosFiltrados.map((item) => (
+                servicosOrdenados.map((item) => (
                   <tr key={item.id_servico} className="hover:bg-slate-800/40 transition">
                     <td className="py-3 px-4 font-mono text-slate-500">#{item.id_servico}</td>
                     <td className="py-3 px-4 font-mono font-medium text-blue-400 whitespace-nowrap">

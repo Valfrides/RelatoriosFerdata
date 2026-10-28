@@ -11,7 +11,7 @@ interface LoginScreenProps {
 }
 
 export function LoginScreen({ onLoginSucesso, customLogo }: LoginScreenProps) {
-  const [username, setUsername] = useState('admin');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [lembrar, setLembrar] = useState(true);
@@ -117,7 +117,7 @@ export function LoginScreen({ onLoginSucesso, customLogo }: LoginScreenProps) {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Ex: admin"
+                placeholder="Digite seu usuário"
                 autoComplete="username"
                 required
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-950/80 border border-slate-700/80 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition"
