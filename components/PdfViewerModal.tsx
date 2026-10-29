@@ -10,7 +10,13 @@ import {
   FileCheck,
 } from 'lucide-react';
 import { DadosPreviaRelatorio } from '@/types';
-import { formatarDataBR, formatarHorasBR, formatarDataExtenso, obterDescritivoFiliais } from '@/lib/pdf-generator';
+import {
+  formatarDataBR,
+  formatarHorasBR,
+  formatarDataExtenso,
+  obterDescritivoFiliais,
+  calcularSomatoriaFiliais,
+} from '@/lib/pdf-generator';
 
 interface PdfViewerModalProps {
   isOpen: boolean;
@@ -70,7 +76,8 @@ export function PdfViewerModal({
   );
   const contratadas = Number(dados?.horasContratadas) || 52;
   const adicionais = Math.max(0, Number((totalHorasCalculado - contratadas).toFixed(2)));
-  const descritivoFiliais = dados ? obterDescritivoFiliais(servicos) : '';
+  const filiaisSomatoria = dados ? calcularSomatoriaFiliais(servicos, adicionais, contratadas) : [];
+  const descritivoFiliais = dados ? obterDescritivoFiliais(servicos, adicionais, contratadas) : '';
 
   const filiaisDistintas = Array.from(new Set(servicos.map((s) => s.nome_unidade).filter(Boolean)));
   const exibirColunaFilial = !dados?.unidadeNome && filiaisDistintas.length > 1;
@@ -352,14 +359,23 @@ export function PdfViewerModal({
                           {formatarHorasBR(adicionais)}
                         </span>
                       </div>
-                      {descritivoFiliais && (
-                        <div className="pt-2 border-t border-slate-200 mt-1">
-                          <span className="font-bold italic text-slate-900 block mb-0.5">
+                      {filiaisSomatoria.length > 0 && (
+                        <div className="pt-2.5 border-t border-slate-300 mt-1.5">
+                          <span className="font-bold italic text-slate-900 block mb-1">
                             Somatória por filial:
                           </span>
-                          <span className="text-slate-700 font-medium leading-relaxed block">
-                            {descritivoFiliais}
-                          </span>
+                          <div className="space-y-1 bg-white p-2 rounded border border-slate-200">
+                            {filiaisSomatoria.map((f) => (
+                              <div key={f.nome} className="flex items-center justify-between text-xs py-0.5">
+                                <span className={`font-bold ${f.isSaoPaulo ? 'text-blue-900' : 'text-slate-900'}`}>
+                                  • {f.nome}:
+                                </span>
+                                <span className={`font-mono font-semibold ${f.isSaoPaulo ? 'text-blue-900 font-bold' : 'text-slate-800'}`}>
+                                  {f.textoHoras}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -375,14 +391,23 @@ export function PdfViewerModal({
                           {formatarHorasBR(totalHorasCalculado)} horas
                         </span>
                       </div>
-                      {descritivoFiliais && (
+                      {filiaisSomatoria.length > 0 && (
                         <div className="pt-2 border-t border-slate-200 mt-1">
-                          <span className="font-bold italic text-slate-900 block mb-0.5">
+                          <span className="font-bold italic text-slate-900 block mb-1">
                             Somatória por filial:
                           </span>
-                          <span className="text-slate-700 font-medium leading-relaxed block">
-                            {descritivoFiliais}
-                          </span>
+                          <div className="space-y-1 bg-white p-2 rounded border border-slate-200">
+                            {filiaisSomatoria.map((f) => (
+                              <div key={f.nome} className="flex items-center justify-between text-xs py-0.5">
+                                <span className="font-bold text-slate-900">
+                                  • {f.nome}:
+                                </span>
+                                <span className="font-mono font-semibold text-slate-800">
+                                  {f.textoHoras}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>

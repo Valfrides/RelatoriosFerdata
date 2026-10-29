@@ -321,7 +321,31 @@ export function gerarRelatorioServicosPDF({
   return doc;
 }
 
-export function obterDescritivoFiliais(servicos: ServicoRealizadoCompleto[]): string {
+export interface FilialSomatoria {
+  nome: string;
+  horas: number;
+  textoHoras: string;
+  isSaoPaulo: boolean;
+}
+
+// Identifica se uma filial é São Paulo (independente de acentuação ou caixa)
+export function isFilialSaoPaulo(nome: string): boolean {
+  if (!nome) return false;
+  const normalizado = nome
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  return normalizado === 'sao paulo' || normalizado === 'sp' || normalizado.includes('sao paulo');
+}
+
+// Calcula a somatória por filial aplicando a regra específica da filial São Paulo:
+// "o valor de horas da filial São Paulo deve ser o 'Total das horas adicionais' menos a soma do total de todas as filiais, exceto São Paulo"
+export function calcularSomatoriaFiliais(
+  servicos: ServicoRealizadoCompleto[],
+  horasAdicionais?: number,
+  horasContratadas: number = 52
+): FilialSomatoria[] {
   const mapa = new Map<string, number>();
   servicos.forEach((s) => {
     const nome = s.nome_unidade && s.nome_unidade.trim() ? s.nome_unidade.trim() : 'Matriz';
@@ -329,14 +353,54 @@ export function obterDescritivoFiliais(servicos: ServicoRealizadoCompleto[]): st
     mapa.set(nome, (mapa.get(nome) || 0) + h);
   });
 
+  if (mapa.size === 0) return [];
+
+  // Se horas adicionais não foram fornecidas diretamente, calcula com base nas contratadas
+  let adicionais = horasAdicionais;
+  if (adicionais === undefined) {
+    const totalHoras = servicos.reduce((acc, s) => acc + (Number(s.qtde_horas) || 0), 0);
+    adicionais = Math.max(0, Number((totalHoras - horasContratadas).toFixed(2)));
+  }
+
+  // Identifica a filial São Paulo e soma todas as outras filiais
+  let chaveSaoPaulo: string | null = null;
+  let somaOutrasFiliais = 0;
+
+  for (const [nome, horas] of mapa.entries()) {
+    if (isFilialSaoPaulo(nome)) {
+      chaveSaoPaulo = nome;
+    } else {
+      somaOutrasFiliais += horas;
+    }
+  }
+
+  // Aplica a fórmula solicitada pelo usuário:
+  // Horas São Paulo = Total das horas adicionais - soma das outras filiais
+  if (chaveSaoPaulo) {
+    const horasCalculadasSP = Math.max(0, Number((adicionais - somaOutrasFiliais).toFixed(2)));
+    mapa.set(chaveSaoPaulo, horasCalculadasSP);
+  }
+
   const filiais = Array.from(mapa.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  return filiais.map(([filial, horas]) => {
+    const textoHoras = horas === 1 ? '1 Hora' : `${formatarHorasBR(horas)} Horas`;
+    return {
+      nome: filial,
+      horas,
+      textoHoras,
+      isSaoPaulo: isFilialSaoPaulo(filial),
+    };
+  });
+}
+
+export function obterDescritivoFiliais(
+  servicos: ServicoRealizadoCompleto[],
+  horasAdicionais?: number,
+  horasContratadas: number = 52
+): string {
+  const filiais = calcularSomatoriaFiliais(servicos, horasAdicionais, horasContratadas);
   if (filiais.length === 0) return '';
-  return filiais
-    .map(([filial, horas]) => {
-      const textoHoras = horas === 1 ? '1 Hora' : `${formatarHorasBR(horas)} Horas`;
-      return `${filial}: ${textoHoras}`;
-    })
-    .join(', ');
+  return filiais.map((f) => `• ${f.nome}: ${f.textoHoras}`).join('\n');
 }
 
 export function gerarRelatorioFavoritaHorasPDF({
@@ -509,19 +573,17 @@ export function gerarRelatorioFavoritaHorasPDF({
     },
   });
 
-  // 6. BLOCO DESCRITIVO
-  const descritivoFiliais = obterDescritivoFiliais(servicos);
-  const temFiliais = descritivoFiliais.length > 0;
+  // 6. BLOCO DESCRITIVO COM SOMATÓRIA POR FILIAL
+  const filiaisSomatoria = calcularSomatoriaFiliais(servicos, adicionais, contratadas);
+  const temFiliais = filiaisSomatoria.length > 0;
 
   const boxWidth = contentWidth > 140 ? 140 : contentWidth;
   const boxX = marginX;
   const labelX = boxX + 6;
   const valueX = boxX + boxWidth - 6;
 
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.5);
-  const linhasFiliais = temFiliais ? doc.splitTextToSize(descritivoFiliais, boxWidth - 12) : [];
-  const alturaExtraFiliais = temFiliais ? 10 + linhasFiliais.length * 4.5 : 0;
+  // Cada filial é apresentada em uma linha dedicada com destaque visual (5.0mm por linha)
+  const alturaExtraFiliais = temFiliais ? 12 + filiaisSomatoria.length * 5.0 : 0;
   const boxHeight = 26 + alturaExtraFiliais;
   const pageHeight = doc.internal.pageSize.getHeight();
 
@@ -570,15 +632,31 @@ export function gerarRelatorioFavoritaHorasPDF({
     doc.setDrawColor(220, 228, 238);
     doc.setLineWidth(0.3);
     doc.line(labelX, lineY, valueX, lineY);
-    lineY += 4.5;
+
+    lineY += 4.8;
     doc.setFont('helvetica', 'bolditalic');
-    doc.setFontSize(8.5);
+    doc.setFontSize(9);
     doc.setTextColor(20, 30, 55);
     doc.text('Somatória por filial:', labelX, lineY);
-    doc.setFont('helvetica', 'normal');
+
     doc.setFontSize(8.5);
-    doc.setTextColor(40, 50, 70);
-    doc.text(linhasFiliais, labelX, lineY + 4.5);
+    filiaisSomatoria.forEach((f) => {
+      lineY += 5.0;
+
+      // Nome da filial em DESTAQUE (Negrito) com marcador •
+      doc.setFont('helvetica', 'bold');
+      if (f.isSaoPaulo) {
+        doc.setTextColor(0, 55, 160); // Destaque sutil para São Paulo
+      } else {
+        doc.setTextColor(20, 30, 55);
+      }
+      doc.text(`• ${f.nome}:`, labelX + 2, lineY);
+
+      // Quantidade de Horas da Filial alinhada à direita na mesma linha
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(15, 23, 42);
+      doc.text(f.textoHoras, valueX, lineY, { align: 'right' });
+    });
   }
 
   const totalPagesCount = (doc.internal as unknown as { getNumberOfPages: () => number }).getNumberOfPages();

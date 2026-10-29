@@ -4,7 +4,13 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { X, Download, Eye, Building, FileText, Settings2 } from 'lucide-react';
 import { Cliente, Unidade, ServicoRealizadoCompleto, DadosPreviaRelatorio } from '@/types';
-import { gerarRelatorioFavoritaHorasPDF, gerarRelatorioServicosPDF, formatarHorasBR, obterDescritivoFiliais } from '@/lib/pdf-generator';
+import {
+  gerarRelatorioFavoritaHorasPDF,
+  gerarRelatorioServicosPDF,
+  formatarHorasBR,
+  obterDescritivoFiliais,
+  calcularSomatoriaFiliais,
+} from '@/lib/pdf-generator';
 
 interface ModalFavoritaHorasProps {
   clienteFavorita: Cliente | null;
@@ -154,7 +160,8 @@ export function ModalFavoritaHoras({
     }
   };
 
-  const descritivoFiliaisTexto = obterDescritivoFiliais(servicos);
+  const filiaisSomatoria = calcularSomatoriaFiliais(servicos, horasAdicionais, contratadas);
+  const descritivoFiliaisTexto = obterDescritivoFiliais(servicos, horasAdicionais, contratadas);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
@@ -358,14 +365,43 @@ export function ModalFavoritaHoras({
               </div>
             </div>
 
-            {descritivoFiliaisTexto && (
+            {filiaisSomatoria.length > 0 && (
               <div className="pt-2 border-t border-amber-800/40">
-                <div className="flex items-center gap-1.5 text-amber-300 text-xs font-bold mb-1">
-                  <Building className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Somatória por Filial (Cobranças Adicionais):</span>
+                <div className="flex items-center justify-between text-amber-300 text-xs font-bold mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <Building className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Somatória por Filial (Cobranças Adicionais):</span>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-normal">
+                    1 por linha
+                  </span>
                 </div>
-                <div className="text-slate-200 text-xs font-medium bg-slate-950/80 p-2.5 rounded-lg border border-slate-800 leading-relaxed">
-                  {descritivoFiliaisTexto}
+                <div className="bg-slate-950/80 rounded-xl border border-slate-800 divide-y divide-slate-800/60 overflow-hidden shadow-inner">
+                  {filiaisSomatoria.map((f) => (
+                    <div
+                      key={f.nome}
+                      className={`flex items-center justify-between px-3.5 py-2 text-xs transition ${
+                        f.isSaoPaulo
+                          ? 'bg-amber-950/25 hover:bg-amber-950/40'
+                          : 'hover:bg-slate-900/60'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${f.isSaoPaulo ? 'bg-amber-400' : 'bg-blue-400'}`} />
+                        <span className="font-bold text-white tracking-wide">
+                          {f.nome}
+                          {f.isSaoPaulo && (
+                            <span className="ml-2 text-[10px] font-semibold text-amber-300 bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/30">
+                              Adicionais Líquidas: {f.textoHoras}
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                      <span className={`font-mono font-bold ${f.isSaoPaulo ? 'text-amber-300 text-sm' : 'text-slate-200'}`}>
+                        {f.textoHoras}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
