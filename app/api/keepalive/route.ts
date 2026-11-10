@@ -19,7 +19,7 @@ export async function GET() {
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   // 2. OPERAÇÃO DE ESCRITA REAL (UPSERT):
-  // Atualiza sempre o registro de ID 1 com a data/hora atual, forçando escrita de disco no Postgres
+  // Atualiza sempre o registro de ID 1 com a data/hora atual, forçando escrita de disco no Postgress
   const { data, error } = await supabase
     .from('keep_alive')
     .upsert(
